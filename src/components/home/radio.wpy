@@ -1,0 +1,48 @@
+<template>
+    <view class="radio">
+        <view class="redBg">
+            <view class="empty"></view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+// import fetch from '../../utils/request.js'
+export default class Radio extends wepy.page {
+    data = {
+        banners: [],
+        indicatorDots: true,
+        autoplay: true,
+        interval: 5000,
+        duration: 1000
+    }
+
+    // onLoad() {
+    //     fetch.get({url: '/banner'}).then(res => {
+    //         if (res.data.code === 200) {
+    //         this.banners = res.data.banners
+    //         console.log(this.banners);
+    //         }
+    //     })
+    // }
+}
+</script>
+
+<style lang="less" scoped>
+@mainColor: #c4483a;
+.radio {
+    .redBg {
+        width: 100%;
+        position: relative;
+        .empty {
+            width: 100%;
+            height: 220rpx;
+            background-color: @mainColor;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+}
+</style>

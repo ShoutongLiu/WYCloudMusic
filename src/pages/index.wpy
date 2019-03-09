@@ -1,0 +1,38 @@
+<template>
+    <view>
+        <Header />
+        <Radio wx:if="{{isShow === 'radio'}}"/>
+        <Recommend wx:if="{{isShow === 'recom'}}"/>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Header from '../components/home/header'
+import Radio from '../components/home/radio'
+import Recommend from '../components/home/recommend'
+
+export default class Index extends wepy.page {
+    data = {
+        isShow: '',
+    }
+    config = {
+        navigationBarTitleText: 'WangYi',
+        backgroundTextStyle: 'light',
+        navigationBarBackgroundColor: '#c4483a',
+        navigationBarTextStyle: 'white'
+    }
+    
+    events = {
+        'active': (Active) => {
+            this.isShow = Active
+        },
+    }
+    components = {
+        Header,
+        Radio,
+        Recommend,
+    }
+
+}
+</script>

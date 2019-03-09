@@ -1,0 +1,220 @@
+<template>
+    <view class="recommend">
+        <view class="redBg">
+            <view class="empty"></view>
+            <!-- 轮播图 -->
+            <swiper class="banner" indicator-dots="{{indicatorDots}}" autoplay 
+            interval="{{interval}}" duration="{{duration}}" indicator-color="#C62F2F" 
+            indicator-active-color="#fff" circular>
+            <block wx:for="{{banner}}" wx:key="{{item}}">
+                <swiper-item class="swiper-item">
+                <image data-id="{{item.targetId}}" src="{{item.imageUrl}}" 
+                class="slide-image"/>
+                </swiper-item>
+            </block>
+            </swiper>
+        </view>
+        <view class="tag">
+            <view wx:for="{{list}}" wx:key="{{item.icon}}" class="itemBox">
+                <view class="circular">
+                    <i class="iconfont {{item.icon}}" />
+                    <i class="date">{{item.date}}</i>
+                </view>   
+                <text class="itemText">{{item.text}}</text>
+            </view>
+        </view>
+        <view class="recommendList">
+            <view class="recommTitle">
+                <text class="recommText">推荐歌单</text>
+                <i class="iconfont icon-tiaozhuanqianwangyoujiantouxiangyouxiayibuxianxing"></i>
+            </view>
+            <view class="songList">
+                <view class="item" wx:for="{{recommend}}" wx:key="{{item.id}}">
+                    <view class="img">
+                        <image class="pic" data-id="{{item.id}}" src="{{item.picUrl}}" alt="{{item.name}}" />
+                        <view class="playCount">
+                            <i class="iconfont icon-headphones"></i>
+                            <span class="num">{{item.playCount}}</span>
+                        </view>
+                    </view>
+                    <text class="info">{{item.name}}</text>
+                </view>  
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+import { playCount } from '../../utils/tool.js'
+export default class Radio extends wepy.page {
+    data = {
+        banner: [],
+        recommend: [],
+        indicatorDots: true,
+        autoplay: true,
+        interval: 5000,
+        duration: 1000,
+
+        list: [
+            {icon: 'icon-fm', date: '', text: '私人FM'},
+            {icon: 'icon-rili1', date: '', text: '每日推荐'},
+            {icon: 'icon-gedan', date: '', text: '歌单'},
+            {icon: 'icon-paihangbang', date: '', text: '排行榜'},
+        ]
+    }
+
+    onLoad() {
+        fetch.get({url: '/banner'}).then(res => {
+            if (res.data.code === 200) {
+                this.banner = res.data.banners
+                this.$apply()
+            }
+        })
+
+        fetch.get({url: '/personalized?limit=6'}).then(res => {
+            if (res.data.code === 200) {
+                this.recommend = res.data.result
+                 res.data.result.forEach(i => {
+                    i.playCount = playCount(i.playCount)
+                })
+                this.$apply()
+            }
+        })
+
+        // 获取当天日期
+        let currentDate = new Date().getDate()
+        this.list[1].date = currentDate
+    }
+}
+</script>
+
+<style lang="less" scoped>
+@mainColor: #c4483a;
+.recommend {
+    .redBg {
+        width: 100%;
+        position: relative;
+        padding-top: 187rpx;
+        .banner {
+            padding: 0 10rpx;
+            &::after {
+                content: " ";
+                display: table;
+            }
+        }
+        .swiper-item {
+            width: 100%;
+            .slide-image {
+                width: 100%;
+                height: 100%;
+                border-radius: 6rpx;
+            }
+        }
+        .empty {
+            width: 100%;
+            height: 420rpx;
+            background-color: @mainColor;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    }
+    .tag {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        padding-top: 40rpx;
+        border-bottom: 1rpx solid rgba(211, 211, 211, .5);
+        .itemBox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .circular {
+                width: 85rpx;
+                height: 85rpx;
+                border-radius: 50%;
+                background-color: @mainColor;
+                text-align: center;
+                position: relative;
+                .iconfont {
+                    color: #fff;
+                    font-size: 40rpx;
+                    line-height: 85rpx;
+                    &.icon-rili1 {
+                        font-size: 50rpx;
+                    }
+                }
+                .date {
+                    color: #fff;
+                    font-size: 24rpx;
+                    position: absolute;
+                    top: 58%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            }
+            .itemText {
+                color: #333;
+                font-size: 20rpx;
+                padding: 20rpx 0;
+            }
+        }
+    }
+    .recommendList {
+        width: 100%;
+        .recommTitle {
+            padding: 20rpx 0 20rpx 10rpx;
+            .recommText {
+                font-size: 28rpx;
+                color: #333;
+                font-weight: bold;
+            }
+            .iconfont {
+                font-size: 28rpx;
+                padding-left: 10rpx;
+            }
+        }
+        .songList {
+            padding: 0 10rpx;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            .item {
+                width: 32.5%;
+                padding-bottom: 40rpx;
+                .img {
+                    width: 100%;
+                    height: 250rpx;
+                    padding-bottom: 10rpx;
+                    position: relative;
+                    .playCount {
+                        position: absolute;
+                        top: 0;
+                        right: 20rpx;
+                        color: #fff;
+                        .icon-headphones {
+                            font-size: 30rpx;
+                        }
+                        .num {
+                            font-size: 20rpx;
+                        }
+                    }
+                }
+                .pic {
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 4rpx;
+                }
+                .info {
+                    font-size: 24rpx;
+                    color: #333;
+                    display: block;
+                    padding: 0 5rpx;
+                }
+            }
+        }
+    }
+}
+</style>

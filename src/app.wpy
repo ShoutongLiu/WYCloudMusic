@@ -1,0 +1,72 @@
+<style lang="less">
+@import './iconfont/iconfont.less';
+
+html, body {
+    font-family: Helvetica Neue,Tahoma,Arial,
+    PingFangSC-Regular,Hiragino Sans GB,Microsoft Yahei,sans-serif;
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+        'pages/index',
+        'pages/radio'
+    ],
+    window: {
+        backgroundTextStyle: 'light',
+        navigationBarBackgroundColor: '#fff',
+        navigationBarTitleText: 'WeChat',
+        navigationBarTextStyle: 'black'
+    },
+    tabBar: {
+        color: "##8c8c8c",
+        selectedColor: "#d81e06",
+        borderStyle: "black",
+        list: [
+            {
+                pagePath: "pages/index",
+                text: "发现",
+                iconPath: "./imgs/wy1.png",
+                selectedIconPath: "./imgs/wy.png",
+            },
+            {
+                pagePath: "pages/radio",
+                text: "视频",
+                iconPath: "./imgs/vidaio1.png",
+                selectedIconPath: "./imgs/vidaio.png",
+            },
+            {
+                pagePath: "pages/radio",
+                text: "我的",
+                iconPath: "./imgs/music1.png",
+                selectedIconPath: "./imgs/music.png",
+            },
+            {
+                pagePath: "pages/radio",
+                text: "朋友",
+                iconPath: "./imgs/friend1.png",
+                selectedIconPath: "./imgs/friend.png",
+            },
+            {
+                pagePath: "pages/radio",
+                text: "账号",
+                iconPath: "./imgs/user1.png",
+                selectedIconPath: "./imgs/user.png",
+            }
+        ]
+
+    }
+}
+
+  constructor () {
+    super()
+    this.use('promisify')
+    this.use('requestfix')
+  }
+}
+</script>

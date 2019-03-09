@@ -1,0 +1,456 @@
+<template lang="wxml">
+    <view class="header">
+        <view class="header-search">
+            <i class="iconfont icon-tinggeshiqu {{isHidden ? 'hidden' : ''}}"></i>
+            <input class="search {{isHidden ? 'paddingLeft' : ''}}" type="text"  placeholder="search" 
+            placeholder-class="placeholderStyle" @focus="searchEvent" 
+            bindinput="valueModel"  bindconfirm="valueModel" value="{{value}}"> 
+            </input>
+            <i class="iconfont icon-sousuo-copy {{isHidden ? 'left-40' : ''}}"></i>
+            <i class="iconfont icon-cuo" wx:if="{{iconCuo}}" @tap="backHot"></i>
+            <i class="iconfont icon-zhengzaibofang {{isHidden ? 'hidden' : ''}}"></i>
+            <text class="cancel {{isHidden ? 'show' : ''}}" @tap="cancelSearch">取消</text>
+        </view>
+        <view class="tab">
+            <text class="recommend text" @tap="recommend">个性推荐</text>
+            <text class="radio text" @tap="radio">主播电台</text>
+            <view class="bottomLine {{Active}}"></view>
+        </view>
+        <view class="resultList" wx:if="{{isShow}}">
+            <view class="searchSinger">
+                <text>按歌手搜索</text>
+                <i class="iconfont icon-tiaozhuanqianwangyoujiantouxiangyouxiayibuxianxing"></i>
+            </view>
+            <view class="hot">
+                <text class="hotText">热门搜索</text>
+                <view class="hotList">
+                    <view class="hotSong" wx:for="{{hotArr}}" wx:key="{{item.first}}"
+                    @tap="getHotVal">
+                        {{item.first}}
+                        <text class="hotText" wx:if="{{item.iconType}}">热</text>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <view class="suggest" wx:if="{{suggestPage}}">
+            <view class="goSearch">
+                搜索 “<text class="searchKey">{{value}}</text>”
+            </view>
+            <view class="searchSuggest" wx:for="{{searchSuggest}}" wx:key="{{item.keyword}}">
+                <i class="iconfont icon-sousuo-copy"></i>
+                <view class="keyList">{{item.keyword}}</view>
+            </view>
+        </view>
+        <view class="result" wx:if="{{showResult}}">
+            <view class="nav">
+                <view class="navItem" wx:for="{{navArr}}" wx:key="{{item}}">
+                    <text class="navText" @tap="tabNav">{{item}}</text>
+                    <view class="{{item === navTitle ? 'bottomLine' : ''}}"></view>
+                </view>
+            </view>
+
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+export default class Header extends wepy.page {
+    data = {
+        Active: '',
+        value: '',
+        isShow: false,
+        isHidden: false,
+        suggestPage: false,
+        iconCuo: false,
+        showResult: false,
+        hotArr: [],
+        songArr: [],
+        searchSuggest: [],
+        navArr: ['单曲', '视频', '歌手', '专辑', '歌单'],
+        navTitle: '单曲',
+    }
+
+     computed = {
+        getSong () {
+          return this.value
+        }
+    }
+
+    onLoad() {
+        this.$emit('active', 'recom')
+        fetch.get({url: '/search/hot'}).then(res => {
+            if (res.data.code === 200) {
+                this.hotArr = res.data.result.hots
+                this.$apply()
+            } else {
+                console.log('err');
+            }
+        })
+    }
+
+    methods = {
+        recommend() {
+            this.Active = 'recom'
+            this.$emit('active', this.Active)
+        },
+        // 点击电台事件
+        radio() {
+            this.Active = 'radio'
+            this.$emit('active', this.Active)
+        },
+        // 点击输入框事件
+        searchEvent() {
+            this.isHidden = true
+            this.isShow = true
+            this.$emit('active', 'isSearch')
+        },  
+        // 取消搜索
+        cancelSearch() {
+            this.iconCuo = false
+            this.isHidden = false
+            this.isShow = false
+            this.suggestPage = false
+            this.showResult = false
+            this.$emit('active', this.Active || 'recom')
+            this.value = ''
+        },
+        // 点击 X icon 回到热搜页面
+        backHot() {
+            this.value = ''
+            this.suggestPage = false
+            this.isShow = true
+            this.iconCuo = false
+        },
+        // 数据绑定
+        valueModel(event) {
+            this.value = event.detail.value
+            if (this.value) {
+                this.iconCuo = true
+                this.suggestPage = true
+                this.isShow = false
+                fetch.get({url: `/search/suggest?keywords=${this.value}&type=mobile`})
+                .then(res => {
+                    if (res.data.code === 200) {
+                        this.searchSuggest = res.data.result.allMatch
+                        this.$apply()
+                    }
+                })
+            } else {
+                this.iconCuo = false
+                this.suggestPage = false
+                this.isShow = true
+            }
+        },
+        // 热搜搜索
+        getHotVal(event) {
+            this.showResult = true
+            this.isShow = false
+            this.value = event._relatedInfo.anchorRelatedText.trim()
+            let hot = this.value.substr(this.value.length-1,1)
+            if (hot === '热') {
+                this.value = this.value.substring(0, this.value.length - 1);
+            }
+            this.methods.search(this.value) 
+            wx.setStorage({
+                key: 'searchKey',
+                data: this.value,
+            }); 
+        },
+        // 切换导航栏
+        tabNav(event) {
+            this.navTitle = event._relatedInfo.anchorTargetText
+        },
+        // 搜索方法
+        search(key) {
+            fetch.get({url: `/search?keywords=${key}&limit=15`}).then(res => {
+                if (res.data.code === 200) {
+                    this.songs =  res.data.result.songs
+                } else {
+                    console.log('err');
+                }
+            })
+        }
+    }
+
+}
+</script>
+
+<style lang="less" scoped>
+@mainColor: #c4483a;
+.placeholderStyle {
+    color: rgba(255, 255, 255, .5);
+    font-size: 32rpx;
+}
+.header {
+    width: 100%;
+    background-color: @mainColor;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    .header-search {
+        width: 100%;
+        padding-top: 20rpx;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        position: relative;
+        .iconfont {
+            width: 60rpx;
+            &.hidden {
+                display: none;
+            }
+        }
+        .cancel {
+            flex: 1;
+            padding-left: 20rpx;
+            font-size: 30rpx;
+            color: #fff;
+            display: none;
+            &.show {
+                display: block;
+            }
+        }
+        .icon-sousuo-copy {
+            position: absolute;
+            top: 25rpx;
+            left: 275rpx;
+            color: rgba(255, 255, 255, .5);
+            font-size: 50rpx;
+            &.left-40 {
+                left: 40rpx;
+            }
+        }
+        .icon-cuo {
+            position: absolute;
+            top: 26rpx;
+            right: 108rpx;
+            width: 50rpx;
+            height: 50rpx;
+            text-align: center;
+            line-height: 50rpx;
+            padding-left: 20rpx;
+            color: @mainColor;
+            z-index: 9999;
+            font-size: 40rpx;
+        }
+        .search {
+            width: 75%;
+            background-color: #ccc;
+            border-radius: 40rpx;
+            height: 60rpx;
+            border: none;
+            text-align: center;
+            color: #fff;
+            font-size: 28rpx;
+            background-color: rgba(255,255,255, .2);
+            box-sizing: border-box;
+            &.paddingLeft {
+                margin-left: 30rpx;
+                animation: paddingLeft .3s;
+                -webkit-animation: paddingLeft .3s;
+                animation-fill-mode: forwards;
+                -webkit-animation-fill-mode: forwards;
+                text-align: left;
+                padding-left: 60rpx;
+            }
+        }
+        .icon-tinggeshiqu, .icon-zhengzaibofang {
+            text-align: center;
+            color: #fff;
+            font-size: 50rpx;
+        }
+        .icon-zhengzaibofang {
+            font-size: 60rpx;
+            display: block;
+            float: right;
+        }
+    }
+    .tab {
+        text-align: center;
+        color: #fff;
+        padding: 20rpx 0;
+        .text {
+            padding: 0 50rpx;
+            font-size: 32rpx;
+        }
+        .bottomLine {
+            width: 60rpx;
+            height: 4rpx;
+            border-radius: 4rpx;
+            background-color: #fff;
+            margin-top: 6rpx;
+            margin-left: 235rpx;
+            &.radio {
+                animation: moveRight .5s;
+                animation-fill-mode: forwards;
+            }
+            &.recom {
+                animation: moveLeft .5s;
+                animation-fill-mode: forwards;
+            }
+        }
+    }
+    .resultList {
+        width: 100%;
+        background-color: #fff;
+        position: absolute;
+        top: 100rpx;
+        left: 0;
+        z-index: 999;
+        .searchSinger {
+            width: 100%;
+            height: 80rpx;
+            border: 1rpx solid rgba(211, 211, 211, .5);
+            text {
+                font-size: 30rpx;
+                color: #333;
+                line-height: 80rpx;
+                padding-left: 20rpx;
+                font-weight: bold;
+            }
+        }
+        .hot {
+            width: 100%;
+            padding-left: 20rpx;
+            .hotText {
+                color: #333;
+                font-size: 28rpx;
+                font-weight: bold;
+            }
+            .hotList {
+                margin-top: 20rxp;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 20rpx 0;
+                .hotSong {
+                    background-color: #ddd;
+                    padding: 10rpx 30rpx;
+                    margin-right: 30rpx;
+                    margin-bottom: 14rpx;
+                    text-align: center;
+                    border-radius: 30rpx;
+                    font-size: 24rpx;
+                    .hotText {
+                        font-size: 18rpx;
+                        background-color: @mainColor;
+                        color: #fff;
+                        padding: 2rpx 4rpx;
+                        border-radius: 5rpx;
+                    }
+                }
+            }
+        }
+    }
+    .suggest {
+        background-color: #fff;
+        width: 100%;
+        position: absolute;
+        top: 100rpx;
+        left: 0;
+        z-index: 999;
+        padding-left: 20rpx;
+        .goSearch {
+            color: #4b70a3;
+            font-size: 28rpx;
+            width: 100%;
+            padding: 20rpx 0;
+            border-bottom: 1rpx solid #ddd;
+        }
+        .searchSuggest {
+            display: flex;
+            align-items: center;
+            .icon-sousuo-copy {
+                font-size: 60rpx;
+                color: #aeaeb0;
+            }
+            .keyList {
+                width: 100%;
+                color: #333;
+                padding: 20rpx 0;
+                font-size: 30rpx;
+                border-bottom: 1rpx solid #ddd;
+            }
+        }
+    }
+    .result {
+        width: 100%;
+        background-color: #fff;
+        position: absolute;
+        top: 100rpx;
+        left: 0;
+        z-index: 999;
+        height: 600rpx;
+        .nav {
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: @mainColor;
+            padding-bottom: 20rpx;
+            .navText {
+                color: #fff;
+                font-size: 30rpx;
+            }
+            .navItem {
+                position: relative;
+                .bottomLine {
+                    height: 4rpx;
+                    width: 60rpx;
+                    border-radius: 5rpx;
+                    background-color: #fff;
+                    position: absolute;
+                    top: 55rpx;
+                    left: -40rpx;
+                    animation: lineMove .3s;
+                    -webkit-animation: lineMove .3s;
+                    animation-fill-mode: forwards;
+                    -webkit-animation-fill-mode: forwards;
+                }
+            }
+        }
+    }
+}
+
+@keyframes lineMove {
+    0% {
+        left: -40rpx;
+    }
+
+    100% {
+        left: 0rpx;
+    }
+}
+
+@keyframes moveRight {
+    0% {
+        margin-left: 235rpx;
+    }
+
+    100% {
+        margin-left: 460rpx;
+    }
+}
+
+
+@keyframes moveLeft {
+    0% {
+       margin-left: 460rpx;
+    }
+
+    100% {
+        margin-left: 235rpx;
+    }
+}
+
+@keyframes paddingLeft {
+    0% {
+        width: 75%;
+    }
+
+    100% {
+        width: 83%;
+    }
+}
+</style>

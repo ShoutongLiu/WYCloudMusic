@@ -1,0 +1,13 @@
+<template>
+    <view>
+        list
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class Radio extends wepy.page {
+
+}
+</script>
