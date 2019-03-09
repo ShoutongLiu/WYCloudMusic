@@ -4,7 +4,7 @@
             <i class="iconfont icon-tinggeshiqu {{isHidden ? 'hidden' : ''}}"></i>
             <input class="search {{isHidden ? 'paddingLeft' : ''}}" type="text"  placeholder="search" 
             placeholder-class="placeholderStyle" @focus="searchEvent" 
-            bindinput="valueModel"  bindconfirm="valueModel" value="{{value}}"> 
+            bindinput="valueModel"  bindconfirm="enterSearch" value="{{value}}"> 
             </input>
             <i class="iconfont icon-sousuo-copy {{isHidden ? 'left-40' : ''}}"></i>
             <i class="iconfont icon-cuo" wx:if="{{iconCuo}}" @tap="backHot"></i>
@@ -34,9 +34,10 @@
         </view>
         <view class="suggest" wx:if="{{suggestPage}}">
             <view class="goSearch">
-                搜索 “<text class="searchKey">{{value}}</text>”
+                搜索 “<text class="searchKey" @tap="enterSearch">{{value}}</text>”
             </view>
-            <view class="searchSuggest" wx:for="{{searchSuggest}}" wx:key="{{item.keyword}}">
+            <view class="searchSuggest" wx:for="{{searchSuggest}}" wx:key="{{item.keyword}}"
+            @tap="enterSearch">
                 <i class="iconfont icon-sousuo-copy"></i>
                 <view class="keyList">{{item.keyword}}</view>
             </view>
@@ -56,7 +57,6 @@ export default class Header extends wepy.page {
         isHidden: false,
         suggestPage: false,
         iconCuo: false,
-        showResult: false,
         hotArr: [],
         searchSuggest: [],
     }
@@ -101,7 +101,6 @@ export default class Header extends wepy.page {
             this.isHidden = false
             this.isShow = false
             this.suggestPage = false
-            this.showResult = false
             this.$emit('active', this.Active || 'recom')
             this.value = ''
         },
@@ -133,9 +132,14 @@ export default class Header extends wepy.page {
                 this.isShow = true
             }
         },
+        // 按下确定键搜索
+        enterSearch(e) {
+            this.value = e.detail.value || e._relatedInfo.anchorTargetText
+            this.$emit('active', 'result')
+            this.$emit('keyWord', this.value)
+        },
         // 热搜搜索
         getHotVal(event) {
-            this.showResult = true
             this.isShow = false
             this.iconCuo = true
             this.$emit('active', 'result')
@@ -169,7 +173,7 @@ export default class Header extends wepy.page {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 99;
+    z-index: 9999;
     .header-search {
         width: 100%;
         padding-top: 20rpx;
