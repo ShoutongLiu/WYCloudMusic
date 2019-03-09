@@ -41,15 +41,7 @@
                 <view class="keyList">{{item.keyword}}</view>
             </view>
         </view>
-        <view class="result" wx:if="{{showResult}}">
-            <view class="nav">
-                <view class="navItem" wx:for="{{navArr}}" wx:key="{{item}}">
-                    <text class="navText" @tap="tabNav">{{item}}</text>
-                    <view class="{{item === navTitle ? 'bottomLine' : ''}}"></view>
-                </view>
-            </view>
-
-        </view>
+       
     </view>
 </template>
 
@@ -66,10 +58,7 @@ export default class Header extends wepy.page {
         iconCuo: false,
         showResult: false,
         hotArr: [],
-        songArr: [],
         searchSuggest: [],
-        navArr: ['单曲', '视频', '歌手', '专辑', '歌单'],
-        navTitle: '单曲',
     }
 
      computed = {
@@ -122,6 +111,7 @@ export default class Header extends wepy.page {
             this.suggestPage = false
             this.isShow = true
             this.iconCuo = false
+            this.$emit('active', 'isSearch')
         },
         // 数据绑定
         valueModel(event) {
@@ -147,31 +137,20 @@ export default class Header extends wepy.page {
         getHotVal(event) {
             this.showResult = true
             this.isShow = false
+            this.iconCuo = true
+            this.$emit('active', 'result')
             this.value = event._relatedInfo.anchorRelatedText.trim()
             let hot = this.value.substr(this.value.length-1,1)
             if (hot === '热') {
                 this.value = this.value.substring(0, this.value.length - 1);
             }
-            this.methods.search(this.value) 
+            this.$emit('keyWord', this.value)
+            // 存储到本地存储
             wx.setStorage({
                 key: 'searchKey',
                 data: this.value,
             }); 
         },
-        // 切换导航栏
-        tabNav(event) {
-            this.navTitle = event._relatedInfo.anchorTargetText
-        },
-        // 搜索方法
-        search(key) {
-            fetch.get({url: `/search?keywords=${key}&limit=15`}).then(res => {
-                if (res.data.code === 200) {
-                    this.songs =  res.data.result.songs
-                } else {
-                    console.log('err');
-                }
-            })
-        }
     }
 
 }
@@ -179,6 +158,7 @@ export default class Header extends wepy.page {
 
 <style lang="less" scoped>
 @mainColor: #c4483a;
+@fontColor: #aeaeb0;
 .placeholderStyle {
     color: rgba(255, 255, 255, .5);
     font-size: 32rpx;
@@ -364,7 +344,7 @@ export default class Header extends wepy.page {
             align-items: center;
             .icon-sousuo-copy {
                 font-size: 60rpx;
-                color: #aeaeb0;
+                color: @fontColor;
             }
             .keyList {
                 width: 100%;
@@ -374,52 +354,6 @@ export default class Header extends wepy.page {
                 border-bottom: 1rpx solid #ddd;
             }
         }
-    }
-    .result {
-        width: 100%;
-        background-color: #fff;
-        position: absolute;
-        top: 100rpx;
-        left: 0;
-        z-index: 999;
-        height: 600rpx;
-        .nav {
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            background-color: @mainColor;
-            padding-bottom: 20rpx;
-            .navText {
-                color: #fff;
-                font-size: 30rpx;
-            }
-            .navItem {
-                position: relative;
-                .bottomLine {
-                    height: 4rpx;
-                    width: 60rpx;
-                    border-radius: 5rpx;
-                    background-color: #fff;
-                    position: absolute;
-                    top: 55rpx;
-                    left: -40rpx;
-                    animation: lineMove .3s;
-                    -webkit-animation: lineMove .3s;
-                    animation-fill-mode: forwards;
-                    -webkit-animation-fill-mode: forwards;
-                }
-            }
-        }
-    }
-}
-
-@keyframes lineMove {
-    0% {
-        left: -40rpx;
-    }
-
-    100% {
-        left: 0rpx;
     }
 }
 

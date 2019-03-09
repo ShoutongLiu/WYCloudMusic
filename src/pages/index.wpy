@@ -3,6 +3,7 @@
         <Header />
         <Radio wx:if="{{isShow === 'radio'}}"/>
         <Recommend wx:if="{{isShow === 'recom'}}"/>
+        <Result wx:if="{{isShow === 'result'}}"/>
     </view>
 </template>
 
@@ -11,6 +12,7 @@ import wepy from 'wepy'
 import Header from '../components/home/header'
 import Radio from '../components/home/radio'
 import Recommend from '../components/home/recommend'
+import Result from '../components/home/result'
 
 export default class Index extends wepy.page {
     data = {
@@ -27,11 +29,15 @@ export default class Index extends wepy.page {
         'active': (Active) => {
             this.isShow = Active
         },
+        'keyWord': (key) => {
+            this.$broadcast('keyword', key)
+        }
     }
     components = {
         Header,
         Radio,
         Recommend,
+        Result,
     }
 
 }
