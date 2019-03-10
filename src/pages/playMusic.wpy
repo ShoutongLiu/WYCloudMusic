@@ -1,0 +1,20 @@
+<template>
+    <view>
+        <Play />
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Play from '../components/play/play'
+export default class PlayMusic extends wepy.page {
+    components = {
+        Play
+    }
+
+
+    onLoad(options) {
+        this.$broadcast('id', options.id)
+    }   
+}
+</script>

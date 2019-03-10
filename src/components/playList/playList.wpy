@@ -1,0 +1,14 @@
+<template>
+    <view>
+        playList
+    </view>
+</template>
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+export default class playList extends wepy.page{
+    data = {
+       
+    }
+}
+</script>

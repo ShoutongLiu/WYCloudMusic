@@ -15,8 +15,12 @@ export default class extends wepy.app {
   config = {
     pages: [
         'pages/index',
-        'pages/radio'
+        'pages/radio',
+        'pages/playMusic',
+        'pages/playList',
     ],
+    // 背景音乐播放
+    "requiredBackgroundModes": ["audio"],
     window: {
         backgroundTextStyle: 'light',
         navigationBarBackgroundColor: '#fff',

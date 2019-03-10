@@ -1,0 +1,46 @@
+<template>
+    <view>
+        Play
+    </view>
+</template>
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+export default class Play extends wepy.page{
+    data = {
+        songName: '',
+        epname: '',
+        songPic: '',
+        title: '',
+        singer: '',
+    }
+
+    events = {
+        'id': (id) => {
+            const player = wx.getBackgroundAudioManager()
+            fetch.get({url: `/song/detail?ids=${id}`}).then(res => {
+                if (res.data.code === 200) {
+                    this.songName = res.data.songs[0].al.name
+                    this.singer =  res.data.songs[0].ar[0].name
+                    this.songPic = res.data.songs[0].al.picUrl 
+                    this.epname = res.data.songs[0].alia[0] 
+                }
+                return fetch.get({url: `/song/url?id=${id}&br=320000`})
+            }).then(res => {
+                if (res.data.code === 200) {
+                    if (res.data.data[0].url) {
+                        player.src = res.data.data[0].url
+                        player.title = this.songName
+                        player.epname = this.epname
+                        player.singer = this.singer
+                        player.coverImgUrl = this.songPic
+                    } else {
+                        console.log('不能播放歌曲');
+                    }
+                    
+                }
+            })
+        }
+    }
+}
+</script>

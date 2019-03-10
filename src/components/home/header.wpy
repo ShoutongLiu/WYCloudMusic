@@ -33,8 +33,8 @@
             </view>
         </view>
         <view class="suggest" wx:if="{{suggestPage}}">
-            <view class="goSearch">
-                搜索 “<text class="searchKey" @tap="enterSearch">{{value}}</text>”
+            <view class="goSearch" @tap="enterSearch">
+                搜索 “<text class="searchKey">{{value}}</text>”
             </view>
             <view class="searchSuggest" wx:for="{{searchSuggest}}" wx:key="{{item.keyword}}"
             @tap="enterSearch">
@@ -91,9 +91,11 @@ export default class Header extends wepy.page {
         },
         // 点击输入框事件
         searchEvent() {
-            this.isHidden = true
-            this.isShow = true
-            this.$emit('active', 'isSearch')
+            if (!this.value) {
+                this.isHidden = true
+                this.isShow = true
+                this.$emit('active', 'isSearch')
+            }
         },  
         // 取消搜索
         cancelSearch() {
@@ -115,6 +117,7 @@ export default class Header extends wepy.page {
         // 数据绑定
         valueModel(event) {
             this.value = event.detail.value
+            this.$emit('active', 'isSearch')
             if (this.value) {
                 this.iconCuo = true
                 this.suggestPage = true
@@ -135,8 +138,12 @@ export default class Header extends wepy.page {
         // 按下确定键搜索
         enterSearch(e) {
             this.value = e.detail.value || e._relatedInfo.anchorTargetText
+            if (this.value.indexOf("“") !== -1) {
+                this.value = this.value.split('“')[1].split('”')[0]
+            }
             this.$emit('active', 'result')
             this.$emit('keyWord', this.value)
+            this.suggestPage = false
         },
         // 热搜搜索
         getHotVal(event) {

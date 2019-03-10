@@ -7,7 +7,8 @@
                 </view>
             </view>
             <view class="resultBox">
-                <view class="songList" wx:for="{{songArr}}" wx:key="{{item.id}}">
+                <navigator class="songList" wx:for="{{songArr}}" wx:key="{{item.id}}"
+                url="/pages/playMusic?id={{item.id}}">
                     <view class="left">
                         <text class="name">{{item.name}}</text>
                         <view class="singer">
@@ -20,7 +21,7 @@
                         <i class="iconfont icon-shipin"></i>
                         <i class="iconfont icon-more"></i>
                     </view>
-                </view>
+                </navigator>
             </view>
         </view>
 </template>
