@@ -4,7 +4,7 @@
 
 1. git clone git@github.com:ShoutongLiu/wangyi.git
 
-2.cd wangyi 
+2. cd wangyi 
 
 3. npm install
 
