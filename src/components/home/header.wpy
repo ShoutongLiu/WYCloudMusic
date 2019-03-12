@@ -16,7 +16,7 @@
             <text class="radio text" @tap="radio">主播电台</text>
             <view class="bottomLine {{Active}}"></view>
         </view>
-        <view class="resultList" wx:if="{{isShow}}">
+        <view class="resultList" hidden="{{!isShow}}">
             <view class="searchSinger">
                 <text>按歌手搜索</text>
                 <i class="iconfont icon-tiaozhuanqianwangyoujiantouxiangyouxiayibuxianxing"></i>
@@ -32,7 +32,7 @@
                 </view>
             </view>
         </view>
-        <view class="suggest" wx:if="{{suggestPage}}">
+        <view class="suggest" hidden="{{!suggestPage}}">
             <view class="goSearch" @tap="enterSearch">
                 搜索 “<text class="searchKey">{{value}}</text>”
             </view>
