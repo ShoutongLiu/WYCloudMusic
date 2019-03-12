@@ -1,15 +1,13 @@
 # WangYiMusic
 
-#### init project
-git clone git@github.com:ShoutongLiu/wangyi.git
+#### 构建步骤
 
-#### Enter the project catalogue
-cd wangyi 
+1. git clone git@github.com:ShoutongLiu/wangyi.git
 
-#### Install dependency packages
-npm install
+2. cd wangyi 
 
-#### Startup project
-npm run dev
+3. npm install
 
-打开微信小程序开发工具,导入项目中的dist文件夹
+4. npm run dev
+
+5. 打开微信小程序开发工具,导入项目中的dist文件夹
