@@ -86,13 +86,9 @@ export default class Header extends wepy.page {
         })
 
         // 获取本地存储
-        wx.getStorage({key: 'searchKey',  success: (res) => {
-            this.historyArr = res.data
-            console.log(this.historyArr);
-        }, fail: function() {
-            console.log('err');
-        }})
+        this.getStory()
     }
+
 
     methods = {
         recommend() {
@@ -111,6 +107,7 @@ export default class Header extends wepy.page {
                 this.isShow = true
                 this.$emit('active', 'isSearch')
             }
+            this.getStory()
         },  
         // 取消搜索
         cancelSearch() {
@@ -127,9 +124,10 @@ export default class Header extends wepy.page {
             this.suggestPage = false
             this.isShow = true
             this.iconCuo = false
+             // 获取本地存储
+            this.getStory()
+            
             this.$emit('active', 'isSearch')
-            // 获取本地存储
-            this.methods.getStory()
         },
         // 数据绑定
         valueModel(event) {
@@ -180,6 +178,7 @@ export default class Header extends wepy.page {
             // 存储到本地存储
             this.methods.setStor('searchKey', this.value)
         },
+        // 搜索历史存入本地存储
         setStor(key, value) {
             wx.getStorage({key: key, success: function(res) {
                 res.data.forEach((item, index) => {
@@ -195,15 +194,7 @@ export default class Header extends wepy.page {
                 wx.setStorage({key: key, data: storyArr})
             }})
         },
-        getStory() {
-            // 获取本地存储
-            wx.getStorage({key: 'searchKey',  success: (res) => {
-                this.historyArr = res.data
-                console.log(this.historyArr);
-            }, fail: function() {
-                console.log('err');
-            }})
-        },
+        
         // 清楚本地存储
         clearHistory() {
             wx.clearStorage('searchKey')
@@ -211,6 +202,15 @@ export default class Header extends wepy.page {
             this.historyShow = true
         }
     }
+    // 获取本地存储
+        getStory() {
+            wx.getStorage({key: 'searchKey',  success: (res) => {
+                this.historyArr = res.data
+                console.log(this.historyArr);
+            }, fail: function() {
+                console.log('err');
+            }})
+        }
 
 }
 </script>
