@@ -31,6 +31,18 @@
                     </view>
                 </view>
             </view>
+            <view class="history" hidden="{{historyShow}}">
+                <view class="title">
+                    <text class="hisText">搜索历史</text>
+                    <i class="iconfont icon-lajitong" @tap="clearHistory"></i>
+                </view>
+                <view class="historyList">
+                    <view class="hisItem" wx:for="{{historyArr}}" wx:key="{{item}}"
+                   @tap="getHotVal">
+                        {{item}}
+                    </view>
+                </view>
+            </view>
         </view>
         <view class="suggest" hidden="{{!suggestPage}}">
             <view class="goSearch" @tap="enterSearch">
@@ -42,7 +54,6 @@
                 <view class="keyList">{{item.keyword}}</view>
             </view>
         </view>
-       
     </view>
 </template>
 
@@ -57,14 +68,10 @@ export default class Header extends wepy.page {
         isHidden: false,
         suggestPage: false,
         iconCuo: false,
+        historyShow: false,
         hotArr: [],
         searchSuggest: [],
-    }
-
-     computed = {
-        getSong () {
-          return this.value
-        }
+        historyArr: [],
     }
 
     onLoad() {
@@ -77,6 +84,14 @@ export default class Header extends wepy.page {
                 console.log('err');
             }
         })
+
+        // 获取本地存储
+        wx.getStorage({key: 'searchKey',  success: (res) => {
+            this.historyArr = res.data
+            console.log(this.historyArr);
+        }, fail: function() {
+            console.log('err');
+        }})
     }
 
     methods = {
@@ -113,6 +128,8 @@ export default class Header extends wepy.page {
             this.isShow = true
             this.iconCuo = false
             this.$emit('active', 'isSearch')
+            // 获取本地存储
+            this.methods.getStory()
         },
         // 数据绑定
         valueModel(event) {
@@ -144,11 +161,15 @@ export default class Header extends wepy.page {
             this.$emit('active', 'result')
             this.$emit('keyWord', this.value)
             this.suggestPage = false
+            this.historyShow = false
+            // 存储到本地存储
+            this.methods.setStor('searchKey', this.value)
         },
         // 热搜搜索
         getHotVal(event) {
             this.isShow = false
             this.iconCuo = true
+            this.historyShow = false
             this.$emit('active', 'result')
             this.value = event._relatedInfo.anchorRelatedText.trim()
             let hot = this.value.substr(this.value.length-1,1)
@@ -157,11 +178,38 @@ export default class Header extends wepy.page {
             }
             this.$emit('keyWord', this.value)
             // 存储到本地存储
-            wx.setStorage({
-                key: 'searchKey',
-                data: this.value,
-            }); 
+            this.methods.setStor('searchKey', this.value)
         },
+        setStor(key, value) {
+            wx.getStorage({key: key, success: function(res) {
+                res.data.forEach((item, index) => {
+                    if (res.data[index] === value) {
+                        res.data.splice(index, 1)
+                    }
+                })
+                res.data.push(value)
+                wx.setStorage({key: key, data: res.data})
+            }, fail: function() {
+                let storyArr = []
+                storyArr.push(value)
+                wx.setStorage({key: key, data: storyArr})
+            }})
+        },
+        getStory() {
+            // 获取本地存储
+            wx.getStorage({key: 'searchKey',  success: (res) => {
+                this.historyArr = res.data
+                console.log(this.historyArr);
+            }, fail: function() {
+                console.log('err');
+            }})
+        },
+        // 清楚本地存储
+        clearHistory() {
+            wx.clearStorage('searchKey')
+            this.historyArr = []
+            this.historyShow = true
+        }
     }
 
 }
@@ -332,6 +380,39 @@ export default class Header extends wepy.page {
                         border-radius: 5rpx;
                     }
                 }
+            }
+        }
+        .history {
+            padding: 0 30rpx 0 20rpx;
+            border-bottom: 1rpx solid rgba(211, 211, 211, .5);
+            .title {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                .hisText {
+                    color: #333;
+                    font-size: 28rpx;
+                    font-weight: bold;
+                }
+                .icon-lajitong {
+                    font-size: 40rpx;
+                }
+            }
+            .historyList {
+                margin-top: 20rxp;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 20rpx 0;
+                
+                .hisItem {
+                    background-color: #ddd;
+                    padding: 10rpx 30rpx;
+                    margin-right: 30rpx;
+                    margin-bottom: 14rpx;
+                    text-align: center;
+                    border-radius: 30rpx;
+                    font-size: 24rpx;
+                } 
             }
         }
     }

@@ -60,7 +60,7 @@ export default class Play extends wepy.page{
                 if (res.data.code === 200) {
                     if (res.data.data[0].url) {
                         player.src = res.data.data[0].url
-                        player.title = this.songName
+                        player.title = this.singer + '-' + this.songName
                         player.epname = this.epname
                         player.singer = this.singer
                         player.coverImgUrl = this.songPic
