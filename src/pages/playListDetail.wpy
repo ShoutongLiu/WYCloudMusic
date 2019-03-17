@@ -1,0 +1,221 @@
+<template>
+    <view class="playList">
+        <image src="{{pic}}" class="bgPic"/>
+        <view class="title">
+            <view class="img">
+                <image src="{{pic}}" class="pic" alt="img"/>
+                <view class="count">
+                    <i class="iconfont icon-headphones"></i>
+                    <text class="num">{{playCount}}</text>
+                </view>
+            </view>
+            <view class="name">
+                {{name}}
+            </view>
+        </view>
+        <view class="songList">
+            <view class="playAll">
+                <i class="iconfont icon-play"></i>
+                <view class="playHead">
+                    <view class="left">
+                    <text class="all">播放全部</text>
+                    <text class="allNUm">{{totalSong}}</text>
+                    </view>
+                    <view class="right">
+                        <i class="iconfont icon-add"></i>
+                        <text class="shoucang">{{subscribedCount}}</text>
+                    </view>
+                </view>
+            </view>
+            <navigator class="item" wx:for="{{songList}}" wx:key="{{item.id}}"
+            url="/pages/playMusic?id={{item.id}}">
+                <text class="index">{{index + 1}}</text>
+                <view class="listBox">
+                    <view class="left">
+                        <view class="name">
+                            {{item.name}}
+                        </view>
+                        <view class="singer">
+                            {{item.ar[0].name}}-{{item.al.name}}
+                        </view>
+                    </view>
+                    <view class="right">
+                        <i class="iconfont icon-shipin"></i>
+                        <i class="iconfont icon-more"></i>
+                    </view>
+                </view>
+            </navigator>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import fetch from '../utils/request.js'
+import { playCount } from '../utils/tool.js'
+export default class PlayListDetail extends wepy.page{
+      config = {
+        navigationBarTitleText: '歌单',
+        backgroundTextStyle: 'light',
+        navigationBarBackgroundColor: '#c4483a',
+        navigationBarTextStyle: 'white'
+    }
+
+    data = {
+        pic: '',
+        playCount: '',
+        name: '',
+        subscribedCount: '',
+        totalSong: 0,
+        songList: [],
+    }
+
+    onLoad(option) {
+        console.log(option.id);
+        fetch.get({url: `/playlist/detail?id=${option.id}`}).then(res => {
+            if (res.data.code === 200) {
+                this.pic = res.data.playlist.coverImgUrl
+                this.playCount = playCount(res.data.playlist.playCount)
+                this.name = res.data.playlist.name
+                this.totalSong = '(共' +  res.data.playlist.tracks.length + '首)'
+                this.subscribedCount = 
+                '收藏(' +  playCount(res.data.playlist.subscribedCount) + ')'
+                this.songList = res.data.playlist.tracks
+                this.$apply()
+            }
+        })
+    }
+}
+</script>
+
+<style lang="less" scoped>
+@mainColor: #c4483a;
+.playList {
+    width: 100%;
+    .bgPic {
+        width: 100%;
+        height: 100vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: -10;
+        filter: blur(16px);
+    }
+    .title {
+        margin-top: 40rpx;
+        display: flex;
+        justify-content: space-around;
+        padding: 0 40rpx 0 20rpx;
+        height: 250rpx;
+        .img {
+            width: 35%;
+            position: relative;
+            .pic {
+                width: 100%;
+                height: 100%;
+                border-radius: 8rpx;
+            }
+            .count {
+                position: absolute;
+                top: 0;
+                right: 10rpx;
+                color: #fff;
+                .icon-headphones {
+                    font-size: 36rpx;
+                }
+                .num {
+                    font-size: 24rpx;
+                }
+            }
+        }
+        .name {
+            padding-left: 20rpx;
+            padding-top: 20rpx;
+            width: 65%;
+            color: #fff;
+            font-size: 36rpx;
+        }
+    }
+    .songList {
+        width: 100%;
+        background-color: #fff;
+        border-radius: 10rpx;
+        margin-top: 80rpx;
+        .playAll {
+            width: 100%;
+            height: 80rpx;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .icon-play {
+            width: 10%;
+            font-size: 40rpx;
+            padding-left: 10rpx;
+        }
+        .playHead {
+            flex: 1;  
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1rpx solid #ddd;
+            .left {
+                color: #333;
+                font-size: 32rpx;
+            }
+            .right {
+                width: 200rpx;
+                height: 100%;
+                background-color: @mainColor;
+                font-size: 24rpx;
+                color: #fff;
+                text-align: center;
+                line-height: 80rpx;
+                border-radius:  0 10rpx 0 0;
+                .icon-add {
+                    font-size: 26rpx;
+                    margin-right: 2rpx;
+                }
+            }
+        }
+    }
+    .item {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .index {
+            width: 80rpx;
+            text-align: center;
+            color: #929394;
+            font-size: 32rpx;
+        }
+        .listBox {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10rpx 0;
+            border-bottom: 1rpx solid #ddd;
+            .left {
+                .name {
+                    color: #333;
+                    font-size: 32rpx;
+                }
+                .singer {
+                    color: #929394;
+                    font-size: 24rpx;
+                }
+            }
+            .right {
+                .iconfont {
+                    color: #929394;
+                    font-size: 32rpx;
+                    padding-right: 40rpx;
+                }
+            }
+        }
+    }
+}
+</style>

@@ -29,7 +29,8 @@
                 <i class="iconfont icon-tiaozhuanqianwangyoujiantouxiangyouxiayibuxianxing"></i>
             </view>
             <view class="songList">
-                <view class="item" wx:for="{{recommend}}" wx:key="{{item.id}}" @tap="toDetail">
+                <navigator class="item" wx:for="{{recommend}}" 
+                wx:key="{{item.id}}" url="/pages/playListDetail?id={{item.id}}">
                     <view class="img">
                         <image class="pic" data-id="{{item.id}}" src="{{item.picUrl}}" alt="{{item.name}}" />
                         <view class="playCount">
@@ -38,7 +39,7 @@
                         </view>
                     </view>
                     <text class="info">{{item.name}}</text>
-                </view>  
+                </navigator>  
             </view>
         </view>
     </view>
@@ -75,10 +76,10 @@ export default class Radio extends wepy.page {
 
         fetch.get({url: '/personalized?limit=6'}).then(res => {
             if (res.data.code === 200) {
-                this.recommend = res.data.result
                  res.data.result.forEach(i => {
                     i.playCount = playCount(i.playCount)
                 })
+                this.recommend = res.data.result
                 this.$apply()
             }
         })
@@ -87,12 +88,19 @@ export default class Radio extends wepy.page {
         let currentDate = new Date().getDate()
         this.list[1].date = currentDate
     }
-
-    methods = {
-        toDetail() {
-            wx.switchTab ({
-                url: '/pages/playList',
+    
+    events = {
+        'banners': (banner) => {
+            this.banner = banner
+        },
+        'playList': (list) => {
+            list.forEach(i => {
+                i.playCount = playCount(i.playCount)
             })
+            this.recommend = list
+        },
+        'date': (date) => {
+            this.list[1].date = date
         }
     }
 }

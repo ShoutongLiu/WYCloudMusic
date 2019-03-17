@@ -13,13 +13,14 @@ import Header from '../components/home/header'
 import Radio from '../components/home/radio'
 import Recommend from '../components/home/recommend'
 import Result from '../components/home/result'
+import fetch from '../utils/request.js'
 
 export default class Index extends wepy.page {
     data = {
         isShow: '',
     }
     config = {
-        navigationBarTitleText: 'WangYi',
+        navigationBarTitleText: 'MyMusic',
         backgroundTextStyle: 'light',
         navigationBarBackgroundColor: '#c4483a',
         navigationBarTextStyle: 'white'
@@ -40,5 +41,26 @@ export default class Index extends wepy.page {
         Result,
     }
 
+    // 下拉刷新
+    onPullDownRefresh() {
+        fetch.get({url: '/banner'}).then(res => {
+            if (res.data.code === 200) {
+                this.$broadcast('banners', res.data.banners)
+                wepy.stopPullDownRefresh()
+            }
+        })
+
+        fetch.get({url: '/personalized?limit=6'}).then(res => {
+            if (res.data.code === 200) {
+                this.$broadcast('playList', res.data.result)
+                wepy.stopPullDownRefresh()
+            }
+        })
+
+        // 获取当天日期
+        let currentDate = new Date().getDate()
+        this.$broadcast('date', currentDate)
+        wepy.stopPullDownRefresh()
+    }
 }
 </script>

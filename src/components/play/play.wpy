@@ -41,36 +41,57 @@ export default class Play extends wepy.page{
         singer: '',
         player: null,
         isPlay: true,
+        detailId: null,
     }
 
     events = {
         'id': (id) => {
-            const player = wx.getBackgroundAudioManager()
-            this.player = player
-            fetch.get({url: `/song/detail?ids=${id}`}).then(res => {
-                if (res.data.code === 200) {
-                    this.songName = res.data.songs[0].al.name
-                    this.singer =  res.data.songs[0].ar[0].name
-                    this.songPic = res.data.songs[0].al.picUrl 
-                    this.epname = res.data.songs[0].alia[0] 
-                    this.$apply()
-                }
-                return fetch.get({url: `/song/url?id=${id}&br=320000`})
-            }).then(res => {
-                if (res.data.code === 200) {
-                    if (res.data.data[0].url) {
-                        player.src = res.data.data[0].url
-                        player.title = this.singer + '-' + this.songName
-                        player.epname = this.epname
-                        player.singer = this.singer
-                        player.coverImgUrl = this.songPic
-                        this.$apply()
-                    } else {
-                        console.log('不能播放歌曲');
+            if (!id) {
+                wx.getStorage({key: 'id',
+                    success: (res)=> {
+                        if (res.data) {
+                            this.detailId = res.data
+                        } else {
+                            this.detailId = '368751'
+                        }
+                        
+                    },
+                    fail: () => {
+                        this.detailId = '368751'
                     }
-                    
-                }
-            })
+                });
+            }
+            
+            setTimeout(() => {
+                let ids = id || this.detailId
+                const player = wx.getBackgroundAudioManager()
+                this.player = player
+                fetch.get({url: `/song/detail?ids=${ids}`}).then(res => {
+                    if (res.data.code === 200) {
+                        this.songName = res.data.songs[0].name
+                        this.singer =  res.data.songs[0].ar[0].name
+                        this.songPic = res.data.songs[0].al.picUrl 
+                        this.epname = res.data.songs[0].alia[0] 
+                        this.$apply()
+                    }
+                    return fetch.get({url: `/song/url?id=${id}&br=320000`})
+                }).then(res => {
+                    if (res.data.code === 200) {
+                        if (res.data.data[0].url) {
+                            player.src = res.data.data[0].url
+                            player.title = this.songName
+                            player.epname = this.epname
+                            player.singer = this.singer
+                            player.coverImgUrl = this.songPic
+                            this.$apply()
+                        } else {
+                            console.log('不能播放歌曲');
+                        }
+                        
+                    }
+                })
+            }, 500);
+            
         }
     }
 
@@ -88,7 +109,9 @@ export default class Play extends wepy.page{
 .playPage {
     width: 100%;
     height: 100vh;
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     .bgImg {
         width: 100%;
         height: 100%;
@@ -196,18 +219,16 @@ export default class Play extends wepy.page{
         }
     }
     .action {
-        width: 100%;
-        position: absolute;
-        bottom: 60rpx;
-        left: 0;
+        margin-top: 300rpx;
         display: flex;
         justify-content: space-around;
+        padding: 0 40rpx;
         align-items: center;
         .iconfont {
             font-size: 40rpx;
             color: #fff; 
             &.tooggle {
-                font-size: 54rpx;  
+                font-size: 70rpx;  
             }
         }
     }

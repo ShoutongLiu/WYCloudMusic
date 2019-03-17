@@ -15,6 +15,9 @@ export default class PlayMusic extends wepy.page {
 
     onLoad(options) {
         this.$broadcast('id', options.id)
+        if (options.id) {
+            wx.setStorage({ key: 'id',data: options.id});
+        }
     }   
 }
 </script>

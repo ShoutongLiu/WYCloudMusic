@@ -17,7 +17,7 @@ export default class extends wepy.app {
         'pages/index',
         'pages/radio',
         'pages/playMusic',
-        'pages/playList',
+        'pages/playListDetail',
     ],
     // 背景音乐播放
     "requiredBackgroundModes": ["audio"],
@@ -25,7 +25,8 @@ export default class extends wepy.app {
         backgroundTextStyle: 'light',
         navigationBarBackgroundColor: '#fff',
         navigationBarTitleText: 'WeChat',
-        navigationBarTextStyle: 'black'
+        navigationBarTextStyle: 'black',
+        "enablePullDownRefresh": true
     },
     tabBar: {
         color: "##8c8c8c",

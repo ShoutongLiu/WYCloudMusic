@@ -8,7 +8,8 @@
             </input>
             <i class="iconfont icon-sousuo-copy {{isHidden ? 'left-40' : ''}}"></i>
             <i class="iconfont icon-cuo" wx:if="{{iconCuo}}" @tap="backHot"></i>
-            <i class="iconfont icon-zhengzaibofang {{isHidden ? 'hidden' : ''}}"></i>
+            <navigator class="iconfont icon-zhengzaibofang {{isHidden ? 'hidden' : ''}}"
+            url="/pages/playMusic"></navigator>
             <text class="cancel {{isHidden ? 'show' : ''}}" @tap="cancelSearch">取消</text>
         </view>
         <view class="tab">
