@@ -46,6 +46,7 @@ export default class Play extends wepy.page{
 
     events = {
         'id': (id) => {
+            console.log(this.isPlay);
             if (!id) {
                 wx.getStorage({key: 'id',
                     success: (res)=> {
@@ -177,7 +178,7 @@ export default class Play extends wepy.page{
     .epPic {
         display: flex;
         justify-content: center;
-        margin-top: 185rpx;
+        padding-top: 185rpx;
         .first {
             width: 620rpx;
             height: 620rpx;
@@ -219,16 +220,18 @@ export default class Play extends wepy.page{
         }
     }
     .action {
-        margin-top: 300rpx;
+        width: 100%;
+        position: absolute;
+        left: 0;
+        bottom: 120rpx;
         display: flex;
         justify-content: space-around;
-        padding: 0 40rpx;
         align-items: center;
         .iconfont {
-            font-size: 40rpx;
+            font-size: 50rpx;
             color: #fff; 
             &.tooggle {
-                font-size: 70rpx;  
+                font-size: 80rpx;  
             }
         }
     }
