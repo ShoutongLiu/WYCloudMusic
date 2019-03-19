@@ -46,7 +46,13 @@ export default class Play extends wepy.page{
 
     events = {
         'id': (id) => {
-            console.log(this.isPlay);
+            wx.getStorage({key: 'isPlay',  success: (res) => {
+                if (!res.data) {
+                    this.isPlay = false
+                }
+            }, fail: function() {
+                console.log('err');
+            }})
             if (!id) {
                 wx.getStorage({key: 'id',
                     success: (res)=> {
@@ -96,9 +102,18 @@ export default class Play extends wepy.page{
         }
     }
 
+    onLoad() {
+        wx.getBackgroundAudioManager().onPlay(() => {
+             wx.removeStorage({key: 'isPlay'})
+        })
+        wx.getBackgroundAudioManager().onPause(() => {
+            console.log(222);
+            wx.setStorage({key: 'isPlay', data: false})
+        })
+    }
+
     methods = {
         togglePlay() {
-            const player = wx.getBackgroundAudioManager()
             this.isPlay = !this.isPlay
             this.isPlay ? this.player.play() : this.player.pause()
         }   
