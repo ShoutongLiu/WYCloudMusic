@@ -201,7 +201,7 @@ export default class Header extends wepy.page {
         
         // 清楚本地存储
         clearHistory() {
-            wx.removeStorage('searchKey')
+            wx.removeStorage({key: 'searchKey'})
             this.historyArr = []
             this.historyShow = true
         }

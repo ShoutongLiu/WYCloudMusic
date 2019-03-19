@@ -46,14 +46,8 @@ export default class Play extends wepy.page{
 
     events = {
         'id': (id) => {
-            wx.getStorage({key: 'isPlay',  success: (res) => {
-                if (!res.data) {
-                    this.isPlay = false
-                }
-            }, fail: function() {
-                console.log('err');
-            }})
             if (!id) {
+                this.isPlay = false
                 wx.getStorage({key: 'id',
                     success: (res)=> {
                         if (res.data) {
@@ -68,7 +62,15 @@ export default class Play extends wepy.page{
                     }
                 });
             }
-            
+            wx.getStorage({key: 'isPlay',  success: (res) => {
+            if (res.data) {
+                this.isPlay = true
+            } else {
+                this.isPlay = false
+            }
+            }, fail: function(res) {
+                return
+            }})
             setTimeout(() => {
                 let ids = id || this.detailId
                 const player = wx.getBackgroundAudioManager()
@@ -97,17 +99,21 @@ export default class Play extends wepy.page{
                         
                     }
                 })
-            }, 500);
+            }, 50);
             
         }
     }
 
     onLoad() {
+
+        console.log(this.isPlay);
+        // 监听播放事件
         wx.getBackgroundAudioManager().onPlay(() => {
-             wx.removeStorage({key: 'isPlay'})
+            this.isPlay = true
+            wx.setStorage({key: 'isPlay', data: true})
         })
+        // 监听暂停事件
         wx.getBackgroundAudioManager().onPause(() => {
-            console.log(222);
             wx.setStorage({key: 'isPlay', data: false})
         })
     }
