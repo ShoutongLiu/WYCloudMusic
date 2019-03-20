@@ -47,7 +47,15 @@ export default class Play extends wepy.page{
     events = {
         'id': (id) => {
             if (!id) {
-                this.isPlay = false
+                wx.getStorage({key: 'isPlay',  success: (res) => {
+                    if (res.data) {
+                        this.isPlay = true
+                    } else {
+                        this.isPlay = false
+                    }
+                    }, fail: function(res) {
+                        return
+                    }})
                 wx.getStorage({key: 'id',
                     success: (res)=> {
                         if (res.data) {
@@ -62,15 +70,7 @@ export default class Play extends wepy.page{
                     }
                 });
             }
-            wx.getStorage({key: 'isPlay',  success: (res) => {
-            if (res.data) {
-                this.isPlay = true
-            } else {
-                this.isPlay = false
-            }
-            }, fail: function(res) {
-                return
-            }})
+         
             setTimeout(() => {
                 let ids = id || this.detailId
                 const player = wx.getBackgroundAudioManager()
