@@ -1,4 +1,4 @@
-# WangYiMusic
+# 仿WangYiMusic小程序
 
 #### 构建步骤
 
