@@ -21,6 +21,11 @@
                 </view>
             </view>
         </view> 
+        <view class="section section_gap">
+            <view class="body-view">
+                <slider bindchange="sliderChange" step="5" class="slider"/>
+            </view>
+        </view>
         <view class="action">
             <i class="iconfont icon-shangyishoushangyige"/> 
             <i class="iconfont {{isPlay ? 'icon-zanting' : 'icon-play'}} tooggle"
@@ -104,24 +109,47 @@ export default class Play extends wepy.page{
         }
     }
 
-    onLoad() {
 
-        console.log(this.isPlay);
+    onLoad() {
+        let listenPlayer =  wx.getBackgroundAudioManager()
+
         // 监听播放事件
-        wx.getBackgroundAudioManager().onPlay(() => {
-            this.isPlay = true
+        listenPlayer.onPlay(() => {
             wx.setStorage({key: 'isPlay', data: true})
         })
+
         // 监听暂停事件
-        wx.getBackgroundAudioManager().onPause(() => {
+        listenPlayer.onPause(() => {
             wx.setStorage({key: 'isPlay', data: false})
         })
+
+         // 监听音频播放进度更新事件
+        listenPlayer.onTimeUpdate(() => {
+            
+        })
+
+        // 监听音频自然播放结束事件
+        listenPlayer.onEnded(() => {
+            this.isPlay = false
+        })
+
     }
 
     methods = {
         togglePlay() {
             this.isPlay = !this.isPlay
             this.isPlay ? this.player.play() : this.player.pause()
+        },
+        sliderChange() {
+            var pageData = {}
+            for (var i = 1; i < 5; ++i) {
+                (function (index) {
+                    pageData[`slider${index}change`] = function (e) {
+                    console.log(`slider${index}发生change事件，携带值为`, e.detail.value)
+                    }
+                })(i);
+            }
+            wepy.page(pageData)
         }   
     }
 }
@@ -167,7 +195,7 @@ export default class Play extends wepy.page{
     }
     .flag {
         position: absolute;
-        top: 118rpx;
+        top: 108rpx;
         left: 47%;
         transform: translate(0, -50%);
         z-index: 1000;
@@ -240,11 +268,18 @@ export default class Play extends wepy.page{
             }
         }
     }
+    .section_gap {
+        margin-top: 80rpx;
+        .body-view {
+            .slider {
+                width: 80%;
+                margin: 0 auto;
+            }
+        }
+    }
     .action {
         width: 100%;
-        position: absolute;
-        left: 0;
-        bottom: 120rpx;
+        margin-top: 120rpx;
         display: flex;
         justify-content: space-around;
         align-items: center;

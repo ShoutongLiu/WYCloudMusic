@@ -171,7 +171,7 @@ export default class Header extends wepy.page {
             this.iconCuo = true
             this.historyShow = false
             this.$emit('active', 'result')
-            this.value = event._relatedInfo.anchorRelatedText.trim()
+            this.value = event._relatedInfo.anchorTargetText.trim()
             let hot = this.value.substr(this.value.length-1,1)
             if (hot === '热') {
                 this.value = this.value.substring(0, this.value.length - 1);

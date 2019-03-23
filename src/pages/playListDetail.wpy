@@ -71,7 +71,6 @@ export default class PlayListDetail extends wepy.page{
     }
 
     onLoad(option) {
-        console.log(option.id);
         fetch.get({url: `/playlist/detail?id=${option.id}`}).then(res => {
             if (res.data.code === 200) {
                 this.pic = res.data.playlist.coverImgUrl
@@ -196,16 +195,28 @@ export default class PlayListDetail extends wepy.page{
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10rpx 0;
+            padding: 10rpx 10rpx;
             border-bottom: 1rpx solid #ddd;
             .left {
                 .name {
                     color: #333;
                     font-size: 32rpx;
+                    width: 90%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-orient: vertical;
                 }
                 .singer {
                     color: #929394;
                     font-size: 24rpx;
+                    width: 90%;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 1;
+                    -webkit-box-orient: vertical;
                 }
             }
             .right {
