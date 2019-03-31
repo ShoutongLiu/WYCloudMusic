@@ -103,22 +103,23 @@ export default class Header extends wepy.page {
         },
         // 点击输入框事件
         searchEvent() {
-            if (!this.value) {
+            console.log(this.value);
+            if (this.value === "") {
                 this.isHidden = true
                 this.isShow = true
-                this.$emit('active', 'isSearch')
+                this.$emit('active', '')
             }
             // 获取本地存储
             this.getStory()
         },  
         // 取消搜索
         cancelSearch() {
+            this.$emit('active', this.Active || 'recom')
+            this.value = ''
             this.iconCuo = false
             this.isHidden = false
             this.isShow = false
             this.suggestPage = false
-            this.$emit('active', this.Active || 'recom')
-            this.value = ''
         },
         // 点击 X icon 回到热搜页面
         backHot() {
@@ -128,13 +129,10 @@ export default class Header extends wepy.page {
             this.iconCuo = false
              // 获取本地存储
             this.getStory()
-            
-            this.$emit('active', 'isSearch')
         },
         // 数据绑定
         valueModel(event) {
             this.value = event.detail.value
-            this.$emit('active', 'isSearch')
             if (this.value) {
                 this.iconCuo = true
                 this.suggestPage = true
@@ -336,6 +334,7 @@ export default class Header extends wepy.page {
     }
     .resultList {
         width: 100%;
+        height: 100vh;
         background-color: #fff;
         position: absolute;
         top: 100rpx;
@@ -421,6 +420,7 @@ export default class Header extends wepy.page {
     .suggest {
         background-color: #fff;
         width: 100%;
+        height: 100vh;
         position: absolute;
         top: 100rpx;
         left: 0;

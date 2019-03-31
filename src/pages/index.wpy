@@ -28,6 +28,7 @@ export default class Index extends wepy.page {
     
     events = {
         'active': (Active) => {
+            console.log(Active);
             this.isShow = Active
         },
         'keyWord': (key) => {
