@@ -73,7 +73,6 @@ export default class Radio extends wepy.page {
                 this.$apply()
             }
         })
-
         fetch.get({url: '/personalized?limit=6'}).then(res => {
             if (res.data.code === 200) {
                  res.data.result.forEach(i => {
@@ -83,7 +82,6 @@ export default class Radio extends wepy.page {
                 this.$apply()
             }
         })
-
         // 获取当天日期
         let currentDate = new Date().getDate()
         this.list[1].date = currentDate

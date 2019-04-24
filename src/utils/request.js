@@ -1,6 +1,7 @@
 import wepy from 'wepy'
 
-let baseUrl = 'https://autumnfish.cn'
+let baseUrl = 'http://47.112.21.93:3000'
+// let baseUrl = 'http://localhost:3000'
 let timeout = 12 * 1000
 let headers = {
   'content-type': 'application/json',
@@ -40,7 +41,7 @@ const fetch = {
             })
           }, timeout)
           wepy.request({
-            url: baseUrl + obj.url,
+            url: obj.url,
             header: {
                 "Content-Type": "application/x-www-form-urlencoded"
             }, 

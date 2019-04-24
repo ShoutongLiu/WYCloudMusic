@@ -1,0 +1,216 @@
+<template>
+    <view class="container">
+        <view class="login" hidden="{{userInfoShow}}">
+            <view class="title">Login</view>
+            <view class="user">
+                <i class="iconfont icon-user"/>
+                <input type="text" class="userInput {{isHeightLight ? 'blue' : ''}}" 
+                placeholder="user" value="{{name}}" bindinput ="userNameInput"
+                @blur="gray"  @focus="heightLight"/>
+            </view>
+            <view class="password">
+                <i class="iconfont icon-password"/>
+                <input type="password" class="pwdInput {{isHeightLight ? 'blue' : ''}}" 
+                placeholder="password" @blur="gray"  @focus="heightLight" 
+                value="{{password}}" bindinput="pwdInput"/>
+            </view>
+            <view class="btn" @tap="login">登录</view>
+            <view class="register" @tap="register">无账号？去注册</view>
+        </view>
+        <view class="userCenter" hidden="{{!userInfoShow}}">
+            <view class="logo">
+                <image src="{{user.avatar}}" class="avatar"/>
+            </view>
+            <view class="username">
+                hello，{{user.name}}
+            </view>
+            <view class="layOut" @tap="layOut">
+                退出登录
+            </view>
+        </view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+export default class Login extends wepy.page{
+    data = {
+        name: '',
+        password: '',
+        isHeightLight: false,
+        user: {},
+        userInfoShow: false,
+    }
+
+    onLoad() {
+         wx.getStorage({key: 'userInfo',  success: (res) => {
+            this.userInfoShow = true
+            this.user = res.data
+            this.$apply()
+        }, fail: function() {
+            this.userInfoShow = false
+            console.log('err');
+        }})
+    }
+
+    methods= {
+        heightLight() {
+            this.isHeightLight = true
+        },
+        gray() {
+            this.isHeightLight = false
+        },
+        userNameInput(e) {
+            this.name = e.detail.value
+        },
+        pwdInput(e) {
+            this.password = e.detail.value
+        },
+        register() {
+            this.$emit('login', 'register')
+        },
+        login(e) {
+            // 先判断是否为空
+            if (this.name && this.password) {
+                let loginForm = {
+                    name: this.name,
+                    password: this.password,
+                }
+                fetch.post({url: 'http://localhost/musicApi/login.php', data: loginForm})
+                .then(res => {
+                    console.log(res.data);
+                    if (res.data.length > 0) {
+                        wx.showToast({
+                            title: '登录成功',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'success',
+                        })
+                        this.userInfoShow = true
+                        wx.setStorage({key: 'userInfo', data: res.data[0]})
+                        this.user = res.data[0]
+                        this.$apply()
+                    } else if (res.data.status === 'fail') {
+                        wx.showToast({
+                            title: '用户名或密码错误',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'none',
+                        })
+                    } else {
+                        wx.showToast({
+                            title: '该账号未注册',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'none',
+                        })
+                    }
+                })
+            } else {
+                wx.showToast({
+                    title: '用户名或密码不能为空',//提示文字
+                    duration:2000,//显示时长
+                    icon: 'none',
+                })
+            } 
+        },
+        layOut() {
+            wx.removeStorage({key: 'userInfo'})
+            this.userInfoShow = false
+            this.name = ''
+            this.password = ''
+        }
+    }
+}
+</script>
+
+<style lang="less" scoped>
+    .container {
+        margin: 200rpx auto;
+        overflow: hidden;
+        .title {
+            text-align: center;
+            font-size: 40rpx;
+            font-weight: bold;
+            margin-bottom: 60rpx;
+        }
+        input {
+            border: 1rpx solid #ccc;
+            border-radius: 0 6rpx 6rpx 0;
+            width: 500rpx;
+            height: 60rpx;
+            padding-left: 10rpx;
+            &.blue {
+                border: 1rpx solid blue;
+            }
+        }
+        .user, .password {
+            width: 100%;
+            display: flex;
+            justify-content: center; 
+        }
+        .user {
+            margin-bottom: 50rpx;
+        }
+        .iconfont {
+            background-color: #ccc;
+            border: 1rpx solid #ccc;
+            width: 50rpx;
+            height: 60rpx;
+            text-align: center;
+            line-height: 60rpx;
+            border-radius: 6rpx 0 0 6rpx;
+            font-size: 40rpx;
+            color: #000;
+        }
+        .btn {
+            width: 570rpx;
+            height: 80rpx; 
+            background-color: blue;
+            margin: 50rpx auto;
+            color: #fff;
+            border-radius: 6rpx;
+            text-align: center;
+            line-height: 80rpx;
+        } 
+        .register {
+             width: 570rpx;
+            height: 80rpx; 
+            background-color: orange;
+            margin: 50rpx auto;
+            color: #fff;
+            border-radius: 6rpx;
+            text-align: center;
+            line-height: 80rpx;
+        }  
+    .userCenter {
+        .logo {
+            margin: 100rpx auto;
+            width: 150rpx;
+            height: 150rpx;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1rpx solid #ccc;
+            .avatar {
+                width: 150rpx;
+                height: 150rpx;
+            }
+        }
+        .username {
+            text-align: center;
+        }
+        .layOut {
+            width: 90%;
+            height: 80rpx;
+            background-color: red;
+            border-radius: 6rpx;
+            text-align: center;
+            line-height: 80rpx;
+            color: #fff;
+            font-weight: bold;
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 0);
+        }
+    }
+}
+</style>

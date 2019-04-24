@@ -17,7 +17,7 @@
             <text class="radio text" @tap="radio">主播电台</text>
             <view class="bottomLine {{Active}}"></view>
         </view>
-        <view class="resultList" hidden="{{!isShow}}">
+        <view class="resultList" hidden="{{!isSearch}}">
             <view class="searchSinger">
                 <text>按歌手搜索</text>
                 <i class="iconfont icon-tiaozhuanqianwangyoujiantouxiangyouxiayibuxianxing"></i>
@@ -65,7 +65,7 @@ export default class Header extends wepy.page {
     data = {
         Active: '',
         value: '',
-        isShow: false,
+        isSearch: false,
         isHidden: false,
         suggestPage: false,
         iconCuo: false,
@@ -103,10 +103,9 @@ export default class Header extends wepy.page {
         },
         // 点击输入框事件
         searchEvent() {
-            console.log(this.value);
             if (this.value === "") {
                 this.isHidden = true
-                this.isShow = true
+                this.isSearch = true
                 this.$emit('active', '')
             }
             // 获取本地存储
@@ -114,29 +113,29 @@ export default class Header extends wepy.page {
         },  
         // 取消搜索
         cancelSearch() {
-            this.$emit('active', this.Active || 'recom')
             this.value = ''
             this.iconCuo = false
             this.isHidden = false
-            this.isShow = false
+            this.isSearch = false
             this.suggestPage = false
+            this.$emit('active', this.Active || 'recom')
         },
         // 点击 X icon 回到热搜页面
         backHot() {
             this.value = ''
             this.suggestPage = false
-            this.isShow = true
+            this.isSearch = true
             this.iconCuo = false
              // 获取本地存储
             this.getStory()
         },
-        // 数据绑定
+        // 搜索建议
         valueModel(event) {
             this.value = event.detail.value
             if (this.value) {
                 this.iconCuo = true
                 this.suggestPage = true
-                this.isShow = false
+                this.isSearch = false
                 fetch.get({url: `/search/suggest?keywords=${this.value}&type=mobile`})
                 .then(res => {
                     if (res.data.code === 200) {
@@ -147,7 +146,7 @@ export default class Header extends wepy.page {
             } else {
                 this.iconCuo = false
                 this.suggestPage = false
-                this.isShow = true
+                this.isSearch = true
             }
         },
         // 按下确定键搜索
@@ -165,7 +164,7 @@ export default class Header extends wepy.page {
         },
         // 热搜搜索
         getHotVal(event) {
-            this.isShow = false
+            this.isSearch = false
             this.iconCuo = true
             this.historyShow = false
             this.$emit('active', 'result')
@@ -185,7 +184,7 @@ export default class Header extends wepy.page {
                     if (res.data[index] === value && res.data.length < 10) {
                         res.data.splice(index, 1)
                     } else if (res.data.length === 10) {
-                        res.data.pop()
+                        res.data.pop()  //删除数组最后一个数据
                     }
                 })
                 res.data.unshift(value)

@@ -18,6 +18,7 @@ export default class extends wepy.app {
         'pages/radio',
         'pages/playMusic',
         'pages/playListDetail',
+        'pages/user',
     ],
     // 背景音乐播放
     "requiredBackgroundModes": ["audio"],
@@ -35,9 +36,9 @@ export default class extends wepy.app {
         list: [
             {
                 pagePath: "pages/index",
-                text: "发现",
-                iconPath: "./imgs/wy1.png",
-                selectedIconPath: "./imgs/wy.png",
+                text: "首页",
+                iconPath: "./imgs/mus.png",
+                selectedIconPath: "./imgs/mus1.png",
             },
             {
                 pagePath: "pages/radio",
@@ -58,7 +59,7 @@ export default class extends wepy.app {
                 selectedIconPath: "./imgs/friend.png",
             },
             {
-                pagePath: "pages/radio",
+                pagePath: "pages/user",
                 text: "账号",
                 iconPath: "./imgs/user1.png",
                 selectedIconPath: "./imgs/user.png",

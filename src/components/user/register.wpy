@@ -1,0 +1,150 @@
+<template>
+    <view class="register">
+        <view class="title">Register</view>
+        <view class="user">
+            <i class="iconfont icon-user"/>
+            <input type="text" class="userInput {{isHeightLight ? 'blue' : ''}}" 
+            placeholder="user" value="{{name}}" bindinput ="userNameInput"
+            @blur="gray"  @focus="heightLight"/>
+        </view>
+        <view class="password">
+            <i class="iconfont icon-password"/>
+            <input type="password" class="pwdInput {{isHeightLight ? 'blue' : ''}}" 
+            placeholder="password" @blur="gray"  @focus="heightLight" 
+            value="{{password}}" bindinput="pwdInput"/>
+        </view>
+        <view class="btn" @tap="register">注册</view>
+        <view class="back" @tap="back">返回登录</view>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import fetch from '../../utils/request.js'
+export default class Register extends wepy.page{
+    data = {
+        name: '',
+        password: '',
+        isHeightLight: false,
+    }
+
+    methods= {
+        heightLight() {
+            this.isHeightLight = true
+        },
+        gray() {
+            this.isHeightLight = false
+        },
+        userNameInput(e) {
+            this.name = e.detail.value
+        },
+        pwdInput(e) {
+            this.password = e.detail.value
+        },
+        back() {
+            this.$emit('login', 'login')
+        },
+        register(e) {
+            // 先判断是否为空
+            if (this.name && this.password) {
+                let registerForm = {
+                    name: this.name,
+                    password: this.password,
+                }
+                fetch.post({url: 'http://localhost/musicApi/register.php', data: registerForm})
+                .then(res => {
+                    console.log(res);
+                    if (res.data.code === '200') {
+                        wx.showToast({
+                            title: '注册成功',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'success',
+                        })
+                        this.$emit('login', 'login')
+                    } else if (res.data.code === '300') {
+                        wx.showToast({
+                            title: '该用户名已注册',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'none',
+                        })
+                    } else if (res.data.code === '400') {
+                        wx.showToast({
+                            title: '注册失败',//提示文字
+                            duration:2000,//显示时长
+                            icon: 'none',
+                        })
+                    }
+                })
+            } else {
+                wx.showToast({
+                    title: '用户名或密码不能为空',//提示文字
+                    duration:2000,//显示时长
+                    icon: 'none',
+                })
+            } 
+        }
+    }
+}
+</script>
+
+<style lang="less" scoped>
+    .register {
+        margin: 200rpx auto;
+        overflow: hidden;
+        .title {
+            text-align: center;
+            font-size: 40rpx;
+            font-weight: bold;
+            margin-bottom: 60rpx;
+        }
+        input {
+            border: 1rpx solid #ccc;
+            border-radius: 0 6rpx 6rpx 0;
+            width: 500rpx;
+            height: 60rpx;
+            padding-left: 10rpx;
+            &.blue {
+                border: 1rpx solid blue;
+            }
+        }
+        .user, .password {
+            width: 100%;
+            display: flex;
+            justify-content: center; 
+        }
+        .user {
+            margin-bottom: 50rpx;
+        }
+        .iconfont {
+            background-color: #ccc;
+            border: 1rpx solid #ccc;
+            width: 50rpx;
+            height: 60rpx;
+            text-align: center;
+            line-height: 60rpx;
+            border-radius: 6rpx 0 0 6rpx;
+            font-size: 40rpx;
+            color: #000;
+        }
+        .btn {
+            width: 570rpx;
+            height: 80rpx; 
+            background-color: orange;
+            margin: 50rpx auto;
+            color: #fff;
+            border-radius: 6rpx;
+            text-align: center;
+            line-height: 80rpx;
+        }   
+        .back {
+             width: 570rpx;
+            height: 80rpx; 
+            background-color: blue;
+            margin: 50rpx auto;
+            color: #fff;
+            border-radius: 6rpx;
+            text-align: center;
+            line-height: 80rpx;
+        }  
+    }
+</style>

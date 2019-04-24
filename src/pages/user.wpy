@@ -1,0 +1,30 @@
+<template>
+    <view>
+        <Login wx:if="{{isShow === 'login'}}"/>
+        <Register wx:if="{{isShow === 'register'}}"/>
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import Login from '../components/user/login'
+import Register from '../components/user/register'
+
+export default class User extends wepy.page {
+    config = {
+        navigationBarTitleText: 'user',
+        backgroundTextStyle: 'light',
+        navigationBarBackgroundColor: '#c4483a',
+        navigationBarTextStyle: 'white'
+    }
+    data = {
+        isShow: 'login',
+    }
+     events = {
+        'login': (vlaue) => {
+            this.isShow = vlaue
+        }
+    }   
+    components = {Login, Register}
+}
+</script>
